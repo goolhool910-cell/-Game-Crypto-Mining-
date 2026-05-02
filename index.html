@@ -2,208 +2,229 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>CryptoEmpire Mobile Fixed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CryptoEmpire: Mobile Edition</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --neon: #00f2ff; --accent: #bc13fe; --bg: #030303;
-            --glass: rgba(255, 255, 255, 0.07); --border: rgba(255, 255, 255, 0.1);
-            --success: #00ff88; --gold: #ffcc00; --danger: #ff3131; --warning: #ffaa00;
+            --glass: rgba(255, 255, 255, 0.05); --border: rgba(255, 255, 255, 0.1);
+            --success: #00ff88; --gold: #ffcc00; --danger: #ff3131;
         }
 
-        * { 
-            box-sizing: border-box; 
-            font-family: 'Inter', -apple-system, sans-serif; 
-            -webkit-tap-highlight-color: transparent; 
-            user-select: none;
-            touch-action: manipulation; /* Фикс зума при тапах */
-        }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
         body {
             background: var(--bg); color: #fff; margin: 0;
-            display: flex; flex-direction: column; 
-            height: 100vh; height: 100dvh; /* Фикс высоты на мобилках */
+            display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 350px 1fr 300px;
+            height: 100vh;
             overflow: hidden;
         }
 
-        #loading-screen {
-            position: fixed; top:0; left:0; width:100%; height:100%; 
-            background: #000; z-index: 9999; display: flex; 
-            flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.4s;
-        }
-        .loader-bar { width: 150px; height: 2px; background: #222; margin-top: 15px; }
-        .loader-fill { width: 0%; height: 100%; background: var(--neon); transition: 0.2s; }
-
-        .app-container { display: flex; flex-direction: column; height: 100%; }
-
-        /* Шапка */
-        .dashboard { 
-            background: #0a0a0a; border-bottom: 1px solid var(--border); 
-            padding: 10px 15px; flex-shrink: 0;
+        .sidebar, .dashboard { 
+            background: #080808; 
+            border: 1px solid var(--border); 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            overflow-y: auto;
         }
 
-        /* Ферма */
         .main { 
-            flex: 1; overflow-y: auto; padding: 10px;
-            background: radial-gradient(circle at top, #0f0f0f, #000);
-            -webkit-overflow-scrolling: touch;
+            padding: 15px; 
+            overflow-y: auto; 
+            background: radial-gradient(circle at center, #111, #000); 
+            position: relative; 
+            flex: 1;
         }
 
-        /* Магазин */
-        .sidebar { 
-            background: #0a0a0a; border-top: 1px solid var(--border);
-            padding: 10px 15px; height: 32vh; overflow-y: auto; flex-shrink: 0;
-        }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .stat-card { background: #121212; padding: 8px; border-radius: 10px; border-left: 3px solid var(--accent); }
-        .stat-card small { color: #555; text-transform: uppercase; font-size: 8px; display: block; margin-bottom: 2px; }
-        .stat-val { font-size: 13px; font-weight: bold; font-variant-numeric: tabular-nums; }
-
-        .farm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .rack { background: rgba(255,255,255,0.02); border: 1px solid #222; border-radius: 12px; padding: 8px; }
-        
-        .slot { 
-            height: 42px; background: rgba(0,0,0,0.5); margin-bottom: 5px; 
-            border-radius: 8px; display: flex; flex-direction: column; 
-            justify-content: center; padding: 0 10px; font-size: 10px; 
-            position: relative; overflow: hidden; border: 1px solid #1a1a1a;
-        }
-        .slot.broken { border-color: var(--danger); color: var(--danger); }
-        .hp-bar { position: absolute; bottom: 0; left: 0; height: 2px; transition: width 0.3s; }
-
-        .btn { 
-            width: 100%; padding: 12px; border-radius: 12px; border: none; 
-            font-weight: 800; cursor: pointer; text-transform: uppercase; font-size: 12px;
-        }
-        .btn-mine { 
-            background: linear-gradient(45deg, var(--neon), var(--accent)); 
-            color: #000; height: 54px; font-size: 15px; margin-top: 8px;
-            box-shadow: 0 4px 15px rgba(0, 242, 255, 0.15);
-        }
-        .btn:active { transform: scale(0.96); }
-
+        .shop-container { display: flex; flex-direction: column; gap: 8px; }
         .shop-item {
             background: var(--glass); border: 1px solid var(--border); border-radius: 12px;
-            padding: 12px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+            padding: 12px; cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; gap: 12px;
         }
-        .shop-item.locked { opacity: 0.25; filter: grayscale(1); pointer-events: none; }
+        .shop-item:active { transform: scale(0.98); background: rgba(0, 242, 255, 0.1); }
+        .shop-item.locked { opacity: 0.3; filter: grayscale(1); }
+        .shop-item i { font-size: 20px; color: var(--neon); width: 25px; }
 
-        .floating-text { 
-            position: absolute; color: var(--neon); font-weight: 900; 
-            pointer-events: none; animation: float 0.6s ease-out forwards; 
-            z-index: 1000; text-shadow: 0 0 10px rgba(0,242,255,0.5);
+        .farm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+        .rack { background: #111; border: 1px solid #222; border-radius: 10px; padding: 10px; }
+        .slot { height: 28px; background: rgba(0,0,0,0.5); margin-bottom: 4px; border-radius: 4px; display: flex; align-items: center; padding: 0 8px; font-size: 10px; border: 1px solid transparent; justify-content: space-between;}
+        .slot.active { border-color: var(--accent); color: var(--neon); }
+        .slot.broken { border-color: var(--danger); color: var(--danger); }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stat-card { background: #121212; padding: 12px; border-radius: 10px; border-left: 3px solid var(--accent); }
+        .stat-card small { color: #555; text-transform: uppercase; font-size: 9px; display: block; }
+        .stat-card div { font-size: 16px; font-weight: bold; }
+
+        .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 12px; }
+        .btn-mine { background: linear-gradient(45deg, var(--neon), var(--accent)); color: #000; height: 60px; font-size: 16px; margin-top: 10px; }
+        .btn-boost { background: var(--gold); color: #000; }
+        .btn-boost.active { background: var(--danger); animation: pulse 1s infinite; }
+
+        @media (max-width: 1024px) {
+            body { overflow-y: auto; height: auto; }
+            .app-container {
+                display: flex;
+                flex-direction: column;
+                height: auto;
+            }
+            .sidebar, .dashboard, .main { 
+                overflow-y: visible; 
+                height: auto; 
+                border: none;
+                border-bottom: 1px solid var(--border);
+            }
+            .dashboard { order: 1; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--neon); }
+            .main { order: 2; min-height: 400px; }
+            .sidebar { order: 3; }
+            .farm-grid { grid-template-columns: 1fr 1fr; }
         }
-        @keyframes float { 
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-70px) scale(1.2); opacity: 0; }
-        }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        .floating-text { position: absolute; color: var(--neon); font-weight: bold; pointer-events: none; animation: float 0.7s forwards; z-index: 1000; text-shadow: 0 0 10px var(--neon); }
+        @keyframes float { to { transform: translateY(-80px); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="loading-screen">
-        <i class="fas fa-microchip fa-2x" style="color: var(--neon)"></i>
-        <div class="loader-bar"><div class="loader-fill" id="load-fill"></div></div>
-    </div>
-
     <div class="app-container">
-        <header class="dashboard">
+        <aside class="dashboard">
             <div class="stats-grid">
-                <div class="stat-card"><small>Баланс</small><div id="cash" class="stat-val" style="color:var(--success)">$ 0</div></div>
-                <div class="stat-card"><small>Хешрейт</small><div id="hash" class="stat-val">0 MH/s</div></div>
-                <div class="stat-card"><small>BTC</small><div id="btc" class="stat-val" style="color:var(--neon)">₿ 0.00000</div></div>
-                <div class="stat-card"><small>Курс</small><div class="stat-val">$<span id="btc-p">0</span></div></div>
+                <div class="stat-card"><small>Баланс</small><div id="cash" style="color:var(--success)">$ 0</div></div>
+                <div class="stat-card"><small>Хешрейт</small><div id="hash">0 MH/s</div></div>
+                <div class="stat-card"><small>Крипто</small><div id="btc" style="color:var(--neon)">₿ 0.00</div></div>
+                <div class="stat-card"><small>Курс BTC</small><div>$<span id="btc-p">65000</span></div></div>
             </div>
-            <div style="display: flex; gap: 8px;">
+            
+            <div style="display: flex; gap: 5px;">
                 <button class="btn" style="background:var(--success); flex: 1" onclick="game.sellBtc()">Продать</button>
-                <button class="btn" id="boost-btn" style="background:var(--gold); color:#000; flex: 1" onclick="game.activateBoost()">BOOST</button>
+                <button class="btn btn-boost" id="boost-btn" style="flex: 1" onclick="game.activateBoost()">BOOST</button>
             </div>
-            <button class="btn btn-mine" onclick="game.manualMine(event)">TAP TO MINE</button>
-        </header>
+            <button class="btn btn-mine" onclick="game.manualMine(event)">ГЕНЕРИРОВАТЬ ХЕШ</button>
+        </aside>
 
-        <main class="main">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h2 style="margin:0; font-size:14px; letter-spacing: 1px;">NODES [<span id="node-count">0</span>]</h2>
-                <button class="btn" style="width:auto; padding:6px 12px; background:var(--glass); color:#fff; border:1px solid var(--border); font-size:10px" onclick="game.buyRack()">+ СТОЙКА ($5k)</button>
+        <main class="main" id="main-area">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; gap: 10px;">
+                <h2 style="margin:0; font-size:18px;">NODES [<span id="node-count">0</span>]</h2>
+                <div style="display: flex; gap: 5px;">
+                    <button class="btn" style="width:auto; padding:8px 12px; background:var(--danger); color:#fff; font-size:10px" onclick="game.repairAll()">РЕМОНТ ($500)</button>
+                    <button class="btn" style="width:auto; padding:8px 12px; background:var(--glass); color:#fff; border:1px solid var(--border); font-size:10px" onclick="game.buyRack()">+ СТОЙКА ($5k)</button>
+                </div>
             </div>
             <div class="farm-grid" id="farm"></div>
         </main>
 
         <aside class="sidebar">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h2 style="margin:0; color:var(--neon); font-size:15px;">GPU MARKET</h2>
-                <div style="font-size: 10px; color:#888;">LVL <span id="lvl">1</span></div>
+            <h2 style="margin:0; color:var(--neon); font-size:18px;">GPU MARKET</h2>
+            <div style="font-size: 11px; color:#888">LEVEL <span id="lvl">1</span> (<span id="xp-pct">0</span>%)</div>
+            <div style="height:4px; background:#222; border-radius:2px;">
+                <div id="xp-bar-fill" style="height:100%; width:0%; background:var(--neon); transition: 0.3s;"></div>
             </div>
-            <div id="shop"></div>
-            <button onclick="game.reset()" style="background:none; border:none; color:#333; padding:20px; font-size: 10px; width: 100%;">СБРОС ПРОГРЕССА</button>
+            <div class="shop-container" id="shop"></div>
+            <button onclick="game.reset()" style="background:none; border:none; color:#333; padding:20px">Сброс прогресса</button>
         </aside>
     </div>
 
     <script>
         const GPUS = [
-            { name: "GT 1030", price: 150, hash: 5, lvl: 1, wear: 0.02, icon: "fa-microchip" },
-            { name: "GTX 1050 Ti", price: 450, hash: 18, lvl: 1, wear: 0.015, icon: "fa-microchip" },
-            { name: "RX 580", price: 900, hash: 40, lvl: 1, wear: 0.012, icon: "fa-microchip" },
-            { name: "RTX 3060", price: 2500, hash: 110, lvl: 3, wear: 0.01, icon: "fa-memory" },
-            { name: "RTX 4080", price: 8000, hash: 400, lvl: 6, wear: 0.008, icon: "fa-bolt" },
-            { name: "RTX 4090", price: 15000, hash: 850, lvl: 10, wear: 0.006, icon: "fa-fire" },
-            { name: "H100 Hopper", price: 180000, hash: 12000, lvl: 20, wear: 0.003, icon: "fa-server" }
+            { name: "GT 1030", price: 150, hash: 5, lvl: 1, icon: "fa-microchip" },
+            { name: "GTX 1050 Ti", price: 450, hash: 18, lvl: 1, icon: "fa-microchip" },
+            { name: "RX 580", price: 900, hash: 40, lvl: 1, icon: "fa-microchip" },
+            { name: "RTX 3060", price: 2500, hash: 110, lvl: 3, icon: "fa-memory" },
+            { name: "RTX 4080", price: 8000, hash: 400, lvl: 6, icon: "fa-bolt" },
+            { name: "RTX 4090", price: 15000, hash: 850, lvl: 10, icon: "fa-fire" },
+            { name: "A100 Tensor", price: 50000, hash: 3000, lvl: 15, icon: "fa-brain" },
+            { name: "H100 Hopper", price: 200000, hash: 12000, lvl: 25, icon: "fa-server" },
+            { name: "Quantum Chip", price: 1000000, hash: 75000, lvl: 50, icon: "fa-atom" },
+            { name: "Dyson Link", price: 10000000, hash: 800000, lvl: 100, icon: "fa-sun" }
         ];
 
         const game = {
-            cash: 1000, btc: 0, hashrate: 0, lvl: 1, xp: 0, nextLvl: 100,
-            racks: [{gpus: []}], btcPrice: 65000, boost: 1,
+            cash: 6000, btc: 0, hashrate: 0, 
+            lvl: 1, xp: 0, nextLvl: 100,
+            racks: [], btcPrice: 65000, boost: 1,
 
             init() {
                 this.load();
-                this.showLoading(() => {
-                    this.renderShop();
-                    this.renderFarm();
-                    this.updateUI();
-                    this.startLoops();
-                });
-                window.addEventListener('beforeunload', () => this.save());
+                this.renderShop();
+                this.renderFarm();
+                this.updateUI();
+                this.startLoops();
             },
 
-            showLoading(callback) {
-                let p = 0;
-                const fill = document.getElementById('load-fill');
-                const interval = setInterval(() => {
-                    p += 20;
-                    fill.style.width = p + '%';
-                    if(p >= 100) {
-                        clearInterval(interval);
-                        const screen = document.getElementById('loading-screen');
-                        screen.style.opacity = '0';
-                        setTimeout(() => { screen.style.display = 'none'; callback(); }, 400);
-                    }
-                }, 60);
+            save() {
+                const data = { cash: this.cash, btc: this.btc, lvl: this.lvl, xp: this.xp, nextLvl: this.nextLvl, racks: this.racks };
+                localStorage.setItem('CryptoEmpire_Mobile_v1', JSON.stringify(data));
+            },
+
+            load() {
+                const s = localStorage.getItem('CryptoEmpire_Mobile_v1');
+                if(s) {
+                    const d = JSON.parse(s);
+                    Object.assign(this, d);
+                    this.recalcHash();
+                }
+            },
+
+            reset() { if(confirm("Удалить всё?")) { localStorage.clear(); location.reload(); } },
+
+            renderShop() {
+                const shop = document.getElementById('shop');
+                shop.innerHTML = GPUS.map((g, i) => `
+                    <div class="shop-item ${this.lvl < g.lvl ? 'locked' : ''}" onclick="game.buyGPU(${i})">
+                        <i class="fas ${g.icon}"></i>
+                        <div style="flex:1">
+                            <b style="font-size:13px">${g.name}</b><br>
+                            <span style="font-size:10px; color:#888">${g.hash} MH/s</span>
+                        </div>
+                        <div style="color:var(--success); font-size:12px">$${g.price >= 1000 ? (g.price/1000).toFixed(1)+'k' : g.price}</div>
+                    </div>
+                `).join('');
+            },
+
+            buyRack() {
+                if (this.cash >= 5000) {
+                    this.cash -= 5000;
+                    this.racks.push({ gpus: [] });
+                    this.renderFarm();
+                    this.updateUI();
+                    this.save();
+                }
             },
 
             buyGPU(id) {
                 const g = GPUS[id];
                 if (this.lvl < g.lvl || this.cash < g.price) return;
                 const rack = this.racks.find(r => r.gpus.length < 8);
-                if (!rack) return alert("Все стойки заняты!");
+                if (!rack) return alert("Нужна новая стойка!");
 
                 this.cash -= g.price;
+                // Добавляем HP видеокарте
                 rack.gpus.push({ ...g, hp: 100 });
                 this.recalcHash();
-                this.addXP(g.price / 8);
+                this.addXP(g.price / 10);
                 this.renderFarm();
                 this.updateUI();
                 this.save();
             },
 
-            repairGPU(ri, gi) {
-                const gpu = this.racks[ri].gpus[gi];
-                const cost = Math.floor(gpu.price * 0.3);
-                if(this.cash >= cost) {
-                    this.cash -= cost;
-                    gpu.hp = 100;
+            repairAll() {
+                if (this.cash < 500) return alert("Недостаточно денег для ремонта!");
+                let repaired = false;
+                this.racks.forEach(r => r.gpus.forEach(g => {
+                    if (g.hp <= 0) { g.hp = 100; repaired = true; }
+                }));
+                if (repaired) {
+                    this.cash -= 500;
                     this.recalcHash();
                     this.renderFarm();
                     this.updateUI();
@@ -212,167 +233,115 @@
 
             recalcHash() {
                 this.hashrate = 0;
-                this.racks.forEach(r => r.gpus.forEach(g => { if(g.hp > 0) this.hashrate += g.hash; }));
-            },
-
-            startLoops() {
-                // Основной цикл: добыча и износ
-                setInterval(() => {
-                    let changed = false;
-                    this.racks.forEach(r => r.gpus.forEach(g => {
-                        if(g.hp > 0) {
-                            // ИЗНОС В 2 РАЗА БЫСТРЕЕ (wear * 2)
-                            g.hp -= (g.wear * 2 * this.boost); 
-                            if(g.hp <= 0) { g.hp = 0; changed = true; }
-                        }
-                    }));
-                    if(changed) this.recalcHash();
-                    
-                    this.btc += (this.hashrate * this.boost) / 5000000;
-                    this.btcPrice += (Math.random() - 0.5) * 300;
-                    if(this.btcPrice < 15000) this.btcPrice = 15000;
-                    
-                    this.updateUI();
-                    this.updateHPUI();
-                }, 1000);
-            },
-
-            updateHPUI() {
-                this.racks.forEach((r, ri) => r.gpus.forEach((g, gi) => {
-                    const bar = document.getElementById(`hp-${ri}-${gi}`);
-                    const hpText = document.getElementById(`hpt-${ri}-${gi}`);
-                    if(bar) {
-                        bar.style.width = g.hp + '%';
-                        bar.style.background = g.hp < 30 ? 'var(--danger)' : (g.hp < 60 ? 'var(--warning)' : 'var(--success)');
-                        if(hpText) hpText.innerText = Math.ceil(g.hp) + '%';
-                        
-                        if(g.hp <= 0) {
-                            const slot = bar.parentElement;
-                            if(!slot.classList.contains('broken')) {
-                                slot.className = 'slot broken';
-                                slot.onclick = () => this.repairGPU(ri, gi);
-                                slot.innerHTML = `<span>🛠 РЕМОНТ ($${Math.floor(g.price*0.3)})</span>`;
-                            }
-                        }
-                    }
+                this.racks.forEach(r => r.gpus.forEach(g => {
+                    if (g.hp > 0) this.hashrate += g.hash;
                 }));
+            },
+
+            addXP(v) {
+                this.xp += v;
+                while (this.xp >= this.nextLvl) {
+                    this.xp -= this.nextLvl;
+                    this.lvl++;
+                    this.nextLvl *= 1.6;
+                    this.renderShop();
+                }
+            },
+
+            activateBoost() {
+                if (this.boost > 1) return;
+                this.boost = 2;
+                const btn = document.getElementById('boost-btn');
+                btn.classList.add('active');
+                setTimeout(() => {
+                    this.boost = 1;
+                    btn.classList.remove('active');
+                }, 20000);
+            },
+
+            manualMine(e) {
+                const power = (15 + (this.hashrate * 0.1)) * this.boost;
+                this.cash += power;
+                this.addXP(power / 4);
+                const x = e.clientX || window.innerWidth / 2;
+                const y = e.clientY || window.innerHeight / 2;
+                this.createFT(x, y, `+$${Math.floor(power)}`);
+                this.updateUI();
+            },
+
+            sellBtc() {
+                if(this.btc <= 0) return;
+                this.cash += this.btc * this.btcPrice;
+                this.btc = 0;
+                this.updateUI();
+                this.save();
+            },
+
+            createFT(x, y, t) {
+                const el = document.createElement('div');
+                el.className = 'floating-text'; el.innerText = t;
+                el.style.left = (x - 20) + 'px'; el.style.top = (y - 20) + 'px';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 700);
             },
 
             renderFarm() {
                 const f = document.getElementById('farm');
-                f.innerHTML = this.racks.map((r, ri) => `
+                f.innerHTML = this.racks.map((r, i) => `
                     <div class="rack">
-                        <div style="font-size:7px; color:#555; margin-bottom:5px">#NODE_${ri+1}</div>
-                        ${Array(8).fill(0).map((_, gi) => {
-                            const g = r.gpus[gi];
-                            if(!g) return `<div class="slot" style="color:#222">EMPTY</div>`;
-                            const isBroken = g.hp <= 0;
-                            return `
-                                <div class="slot ${isBroken ? 'broken' : ''}" ${isBroken ? `onclick="game.repairGPU(${ri},${gi})"` : ''}>
-                                    <div style="display:flex; justify-content:space-between; z-index:1">
-                                        <span>${isBroken ? '🛠 REPAIR' : g.name}</span>
-                                        <span id="hpt-${ri}-${gi}">${Math.ceil(g.hp)}%</span>
-                                    </div>
-                                    ${!isBroken ? `<div class="hp-bar" id="hp-${ri}-${gi}" style="width:${g.hp}%"></div>` : ''}
-                                </div>`;
+                        <div style="font-size:9px; color:#444; margin-bottom:5px">NODE_0${i+1}</div>
+                        ${Array(8).fill(0).map((_, idx) => {
+                            const gpu = r.gpus[idx];
+                            const isBroken = gpu && gpu.hp <= 0;
+                            return `<div class="slot ${gpu ? (isBroken ? 'broken' : 'active') : ''}">
+                                <span>${gpu ? gpu.name : 'EMPTY'}</span>
+                                <span style="font-size:8px">${gpu ? (isBroken ? '!!!' : Math.floor(gpu.hp)+'%') : ''}</span>
+                            </div>`;
                         }).join('')}
                     </div>
                 `).join('');
                 document.getElementById('node-count').innerText = this.racks.length;
             },
 
-            renderShop() {
-                document.getElementById('shop').innerHTML = GPUS.map((g, i) => `
-                    <div class="shop-item ${this.lvl < g.lvl ? 'locked' : ''}" onclick="game.buyGPU(${i})">
-                        <i class="fas ${g.icon}" style="color:var(--neon); font-size:16px"></i>
-                        <div style="flex:1">
-                            <b style="font-size:12px">${g.name}</b><br>
-                            <small style="color:#666; font-size:9px">${g.hash} MH/s | Lvl ${g.lvl}</small>
-                        </div>
-                        <div style="color:var(--success); font-weight:bold; font-size:12px">$${g.price >= 1000 ? (g.price/1000).toFixed(g.price >= 10000 ? 0 : 1)+'k' : g.price}</div>
-                    </div>
-                `).join('');
-            },
-
             updateUI() {
                 document.getElementById('cash').innerText = `$${Math.floor(this.cash).toLocaleString()}`;
-                document.getElementById('btc').innerText = `₿ ${this.btc.toFixed(5)}`;
-                document.getElementById('hash').innerText = `${Math.floor(this.hashrate).toLocaleString()} MH/s`;
+                document.getElementById('btc').innerText = `₿ ${this.btc.toFixed(4)}`;
+                document.getElementById('hash').innerText = `${this.hashrate.toLocaleString()} MH/s`;
                 document.getElementById('lvl').innerText = this.lvl;
+                document.getElementById('xp-pct').innerText = Math.floor((this.xp/this.nextLvl)*100);
+                document.getElementById('xp-bar-fill').style.width = (this.xp/this.nextLvl*100) + "%";
                 document.getElementById('btc-p').innerText = Math.floor(this.btcPrice).toLocaleString();
             },
 
-            buyRack() {
-                if(this.cash >= 5000) {
-                    this.cash -= 5000;
-                    this.racks.push({gpus:[]});
-                    this.renderFarm();
+            startLoops() {
+                setInterval(() => {
+                    // Логика износа
+                    let needRecalc = false;
+                    this.racks.forEach(r => r.gpus.forEach(g => {
+                        if (g.hp > 0) {
+                            g.hp -= Math.random() * 0.2; // Случайный износ
+                            if (g.hp <= 0) {
+                                g.hp = 0;
+                                needRecalc = true;
+                            }
+                        }
+                    }));
+
+                    if (needRecalc) {
+                        this.recalcHash();
+                        this.renderFarm();
+                    }
+
+                    this.btc += (this.hashrate * this.boost) / 3000000;
+                    this.btcPrice += (Math.random() - 0.5) * 600;
+                    if(this.btcPrice < 20000) this.btcPrice = 20000;
                     this.updateUI();
-                }
-            },
-
-            sellBtc() {
-                if(this.btc > 0) {
-                    this.cash += this.btc * this.btcPrice;
-                    this.btc = 0;
-                    this.updateUI();
-                    this.save();
-                }
-            },
-            
-            manualMine(e) {
-                if (navigator.vibrate) navigator.vibrate(10);
-                const power = (10 + (this.hashrate * 0.03)) * this.boost;
-                this.cash += power;
-                this.addXP(power/5);
-                this.updateUI();
-                
-                const x = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-                const y = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
-                
-                const el = document.createElement('div');
-                el.className = 'floating-text'; el.innerText = `+$${Math.floor(power)}`;
-                el.style.left = (x || window.innerWidth/2) + 'px'; 
-                el.style.top = (y || window.innerHeight/2) + 'px';
-                document.body.appendChild(el); 
-                setTimeout(() => el.remove(), 600);
-            },
-
-            addXP(v) {
-                this.xp += v;
-                if(this.xp >= this.nextLvl) {
-                    this.xp = 0; this.lvl++; this.nextLvl *= 1.6;
-                    this.renderShop();
-                }
-            },
-
-            activateBoost() {
-                if(this.boost > 1) return;
-                this.boost = 2;
-                const b = document.getElementById('boost-btn');
-                b.style.background = 'var(--danger)'; b.innerText = "X2 ACTIVE";
-                setTimeout(() => { 
-                    this.boost = 1; 
-                    b.style.background = 'var(--gold)'; 
-                    b.innerText = "BOOST"; 
-                }, 20000);
-            },
-
-            save() {
-                const data = { cash: this.cash, btc: this.btc, lvl: this.lvl, xp: this.xp, nextLvl: this.nextLvl, racks: this.racks };
-                localStorage.setItem('CryptoEmpire_Mobile_V3', JSON.stringify(data));
-            },
-
-            load() {
-                const s = localStorage.getItem('CryptoEmpire_Mobile_V3');
-                if(s) {
-                    const d = JSON.parse(s);
-                    Object.assign(this, d);
-                    this.recalcHash();
-                }
-            },
-
-            reset() { if(confirm("Сбросить весь прогресс?")) { localStorage.clear(); location.reload(); } }
+                    
+                    // Обновляем проценты HP в интерфейсе раз в сек без полного ререндера
+                    if(!needRecalc) this.renderFarm(); 
+                }, 1000);
+                setInterval(() => this.save(), 10000);
+            }
         };
 
         game.init();
